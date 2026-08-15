@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>坦克大战</title>
+    <link rel="stylesheet" href="style.css"> <!-- 引入外部样式表 -->
+</head>
+<body>
+
+    <!-- 主容器：限制宽度并居中 -->
+    <div class="container">
+
+        <!-- 1. 标题区域：显示游戏名称 -->
+        <h1>坦克大战</h1>
+
+        <!-- 2. 状态信息栏：左边得分，中间生命，右边最高分 -->
+        <div class="info-bar">
+            <span id="scoreText">得分：0</span>
+            <span id="livesText">生命：3</span>
+            <span id="highScoreText">最高分：0</span>
+            <button id="pauseBtn" class="pause-btn">暂停</button>
+        </div>
+
+        <!-- 3. 游戏画布：用于绘制坦克、地图等游戏画面，尺寸 800x600 -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <!-- 4. 控制按钮区域：左边十字方向键，右边开火按钮 -->
+        <div class="controls">
+            <!-- 十字方向键：上、左、右、下（用 CSS 网格拼成十字） -->
+            <div class="dpad">
+                <button id="btnUp" class="dir-btn">上</button>
+                <button id="btnLeft" class="dir-btn">左</button>
+                <button id="btnRight" class="dir-btn">右</button>
+                <button id="btnDown" class="dir-btn">下</button>
+            </div>
+            <!-- 开火按钮 -->
+            <button id="btnFire">开火</button>
+        </div>
+
+        <!-- 6. 底部署名 -->
+        <p class="footer">sjm 作品</p>
+
+    </div>
+
+    <!-- ================ 主页界面（游戏开始前显示） ================ -->
+    <div id="homeScreen" class="overlay">
+        <div class="overlay-content">
+            <h2>坦克大战</h2>
+            <p class="subtitle">选择你的坦克和关卡，开始战斗</p>
+
+            <!-- 皮肤选择区 -->
+            <div class="section-label">选择坦克皮肤</div>
+            <div id="skinGrid" class="skin-grid">
+                <!-- 5 个皮肤卡片，JS 动态生成内容 -->
+                <div class="skin-card selected" data-skin="0">
+                    <canvas class="skin-preview" width="48" height="48"></canvas>
+                    <span>经典黄</span>
+                </div>
+                <div class="skin-card" data-skin="1">
+                    <canvas class="skin-preview" width="48" height="48"></canvas>
+                    <span>钢铁灰</span>
+                </div>
+                <div class="skin-card" data-skin="2">
+                    <canvas class="skin-preview" width="48" height="48"></canvas>
+                    <span>森林绿</span>
+                </div>
+                <div class="skin-card" data-skin="3">
+                    <canvas class="skin-preview" width="48" height="48"></canvas>
+                    <span>沙漠金</span>
+                </div>
+                <div class="skin-card" data-skin="4">
+                    <canvas class="skin-preview" width="48" height="48"></canvas>
+                    <span>烈焰红</span>
+                </div>
+            </div>
+
+            <!-- 关卡选择区 -->
+            <div class="section-label">选择关卡（越往后敌人越强）</div>
+            <div id="levelGrid" class="level-grid">
+                <!-- 10 个关卡按钮，JS 动态绑定点击 -->
+            </div>
+
+            <!-- 背景选择区：按钮点开弹出 3 张图片，点选一张作为游戏内背景 -->
+            <div class="section-label">选择游戏背景</div>
+            <div class="bg-select-row">
+                <button id="bgSelectBtn" class="bg-select-btn">选择背景</button>
+                <span id="bgCurrentName" class="bg-current-name">未选择</span>
+            </div>
+            <div id="bgPanel" class="bg-panel" style="display:none;">
+                <!-- 3 张背景缩略图，点击设为游戏内背景（同时作为主页背景预览） -->
+                <div class="bg-thumb" data-bg="0">
+                    <img src="图片/一博.jpg" alt="一博">
+                    <span>一博</span>
+                </div>
+                <div class="bg-thumb" data-bg="1">
+                    <img src="图片/西风.jpg" alt="西风">
+                    <span>西风</span>
+                </div>
+                <div class="bg-thumb" data-bg="2">
+                    <img src="图片/浩源.jpg" alt="浩源">
+                    <span>浩源</span>
+                </div>
+            </div>
+
+            <!-- AI 地图生成区域：输入描述 + 生成按钮 + 加载提示（默认隐藏） -->
+            <div class="section-label">用 AI 生成地图（可选）</div>
+            <div class="ai-area">
+                <input type="text" id="mapDescription" placeholder="描述你想要的地图，如：迷宫复杂">
+                <button id="aiGenerateBtn">AI 生成地图</button>
+                <span id="aiLoadingText">AI 正在生成地图...</span>
+            </div>
+
+            <!-- 开始按钮 -->
+            <button id="startGameBtn" class="big-btn">开始游戏</button>
+        </div>
+    </div>
+
+    <!-- ================ 游戏结束界面 ================ -->
+    <div id="gameOverScreen" class="overlay" style="display: none;">
+        <div class="overlay-content">
+            <h2 id="gameOverTitle">游戏结束</h2>
+            <p id="gameOverReason" class="subtitle"></p>
+            <div class="gameover-stats">
+                <p>最终得分：<span id="finalScore">0</span></p>
+                <p>到达关卡：<span id="finalLevel">1</span></p>
+            </div>
+            <!-- DeepSeek 关卡评价弹窗内容 -->
+            <div id="evalBox" class="eval-box">
+                <div class="eval-label">来自 DeepSeek 的评价：</div>
+                <div id="evalContent" class="eval-content">正在生成评价...</div>
+            </div>
+            <div class="gameover-btns">
+                <button id="retryBtn" class="big-btn">重新挑战</button>
+                <button id="homeBtn" class="big-btn btn-secondary">回到主页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入游戏逻辑脚本（放在 body 末尾，确保页面元素先加载完） -->
+    <script src="game.js"></script>
+
+</body>
+</html>

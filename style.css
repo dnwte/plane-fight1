@@ -1,0 +1,524 @@
+/* ================= 全局设置 ================= */
+
+/* 页面整体：深灰色背景，内容水平居中 */
+body {
+    background-color: #2b2b2b;          /* 深灰色背景 */
+    margin: 0;                          /* 去掉浏览器默认外边距 */
+    padding: 20px;                      /* 页面四周留一点空隙 */
+    font-family: "Microsoft YaHei", Arial, sans-serif; /* 中文字体优先 */
+    color: #fff;                        /* 默认文字为白色 */
+    text-align: center;                 /* 内部内容整体居中 */
+    box-sizing: border-box;             /* 方便计算宽高 */
+}
+
+/* 页面主容器：限制最大宽度并水平居中 */
+.container {
+    max-width: 840px;                   /* 比画布 800px 稍宽一点 */
+    margin: 0 auto;                     /* 左右自动外边距 = 水平居中 */
+}
+
+/* ================= 1. 标题 ================= */
+
+/* 标题：白色大字，带一点阴影增加立体感 */
+h1 {
+    color: #ffffff;                     /* 白色大字 */
+    font-size: 42px;                    /* 大字号 */
+    text-shadow: 3px 3px 6px #000;      /* 黑色阴影，向右下偏移 */
+    margin: 10px 0 15px;                /* 上下留白 */
+    letter-spacing: 8px;                /* 字与字之间拉开距离，更有气势 */
+}
+
+/* ================= 2. 状态信息栏 ================= */
+
+/* 信息栏：得分 / 生命 / 最高分 / 暂停按钮 */
+.info-bar {
+    color: #cccccc;                     /* 浅灰色文字 */
+    font-size: 20px;                    /* 字体稍大 */
+    display: flex;                      /* 弹性布局，方便分布 */
+    justify-content: space-between;     /* 各项均匀分布 */
+    align-items: center;                /* 垂直居中对齐 */
+    max-width: 800px;                   /* 与画布同宽 */
+    margin: 0 auto 15px;                /* 水平居中，底部留白 */
+    padding: 0 10px;                    /* 左右留一点内边距 */
+}
+
+/* 暂停按钮：信息栏最右侧的小按钮 */
+.pause-btn {
+    font-size: 14px;
+    color: #fff;
+    background-color: #555;            /* 深灰底 */
+    border: 2px solid #888;            /* 灰边框 */
+    border-radius: 6px;                /* 圆角 */
+    padding: 4px 16px;                 /* 紧凑内边距 */
+    cursor: pointer;
+    transition: background 0.15s;      /* hover 过渡 */
+}
+
+.pause-btn:hover {
+    background-color: #777;            /* hover 变亮 */
+}
+
+.pause-btn:active {
+    transform: scale(0.95);            /* 点击反馈 */
+}
+
+/* ================= 3. 游戏画布 ================= */
+
+/* 画布：黑色背景 + 黑色边框（手机上也能看清边界） */
+#gameCanvas {
+    background-color: #000;             /* 画布内部黑色，像老式战场 */
+    border: 4px solid #000;             /* 黑色边框 */
+    box-shadow: 0 0 12px #000;          /* 周围一点阴影，让画布浮起来 */
+    max-width: 100%;                    /* 小屏幕时自动缩小，不撑破页面 */
+    touch-action: none;                 /* 禁止触摸画布时页面跟着滚动 */
+}
+
+/* ================= 4. AI 生成地图区域 ================= */
+
+/* AI 区域容器：上下留白 */
+.ai-area {
+    margin: 20px auto;                  /* 上下留白，水平居中 */
+}
+
+/* 输入框：宽度适中，深色配色 */
+#mapDescription {
+    width: 360px;                       /* 适中宽度 */
+    max-width: 80%;                     /* 手机上不超屏 */
+    padding: 10px 14px;                 /* 内边距，文字不贴边 */
+    font-size: 16px;                    /* 字号舒适 */
+    border: 2px solid #555;             /* 灰色边框 */
+    border-radius: 8px;                 /* 圆角 */
+    background-color: #3a3a3a;          /* 深色底 */
+    color: #fff;                        /* 白色文字 */
+    outline: none;                      /* 去掉聚焦时的默认外框 */
+}
+
+/* 输入框获得焦点时边框变亮，提示正在输入 */
+#mapDescription:focus {
+    border-color: #1e90ff;              /* 蓝色高亮 */
+}
+
+/* AI 生成按钮：蓝色主操作按钮 */
+#aiGenerateBtn {
+    padding: 10px 20px;                 /* 大一点，好点击 */
+    font-size: 16px;
+    color: #fff;
+    background-color: #1e90ff;          /* 蓝色 */
+    border: none;                       /* 无边框 */
+    border-radius: 8px;                 /* 圆角 */
+    cursor: pointer;                    /* 鼠标变小手 */
+}
+
+/* 鼠标移上去时颜色变深一点 */
+#aiGenerateBtn:hover {
+    background-color: #1877cd;
+}
+
+/* 加载提示文字：默认隐藏，等 JS 需要时再显示 */
+#aiLoadingText {
+    display: none;                      /* 默认隐藏 */
+    color: #ffcc00;                     /* 黄色提示 */
+    font-size: 14px;
+    margin-left: 10px;                  /* 和按钮之间留点距离 */
+}
+
+/* ================= 5. 控制按钮区域 ================= */
+
+/* 控制区：左边十字方向键 + 右边开火按钮 */
+.controls {
+    display: flex;                      /* 弹性布局，左右排 */
+    justify-content: space-between;     /* 十字键推到最左，开火键推到最右 */
+    align-items: flex-end;              /* 底部对齐：两边按钮都贴着下边线 */
+    margin: 20px auto;                  /* 上下留白 */
+}
+
+/* 十字方向键：用 3x3 网格拼出十字 */
+.dpad {
+    display: grid;                      /* 网格布局 */
+    grid-template-columns: repeat(3, 64px);  /* 三列，每列 64px */
+    grid-template-rows: repeat(3, 64px);     /* 三行，每行 64px */
+    gap: 6px;                           /* 按钮之间的小缝隙 */
+}
+
+/* 方向按钮通用样式：大尺寸 + 圆角，适合手指点 */
+.dir-btn {
+    font-size: 20px;
+    color: #fff;
+    background-color: #4a4a4a;          /* 灰色按键 */
+    border: 2px solid #666;
+    border-radius: 14px;                /* 明显圆角 */
+    cursor: pointer;
+}
+
+/* "上"按钮：放在第一行中间（第 2 列） */
+#btnUp {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* "左"按钮：放在第二行第 1 列 */
+#btnLeft {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+/* "右"按钮：放在第二行第 3 列 */
+#btnRight {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+/* "下"按钮：放在第三行中间（第 2 列） */
+#btnDown {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+/* 按下方向键时变亮，给玩家触觉反馈 */
+.dir-btn:active {
+    background-color: #6a6a6a;
+}
+
+/* 开火按钮：放在十字键右边，红色更显眼 */
+#btnFire {
+    width: 90px;
+    height: 90px;                       /* 又大又圆，好按 */
+    font-size: 22px;
+    color: #fff;
+    background-color: #c0392b;          /* 红色 */
+    border: 3px solid #e74c3c;
+    border-radius: 50%;                 /* 圆形按钮 */
+    cursor: pointer;
+    box-shadow: 0 4px 10px #000;        /* 阴影，立体感 */
+}
+
+/* 按下开火键时下沉一点 */
+#btnFire:active {
+    transform: scale(0.94);             /* 稍微缩小，像真的按下去 */
+    background-color: #a93226;
+}
+
+/* ================= 6. 底部署名 ================= */
+
+/* 底部小字：灰色，居中 */
+.footer {
+    color: #888;                        /* 灰色小字 */
+    font-size: 18px;
+    text-align: center;                 /* 居中（body 已设，这里保险起见再写一次） */
+    margin-top: 10px;
+}
+
+/* ================= 7. 主页 / 游戏结束 覆盖层 ================= */
+
+/* 全屏覆盖层：固定在画布上方，半透明背景 + 居中内容 */
+.overlay {
+    position: fixed;                     /* 固定定位，不随页面滚动 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(20, 20, 20, 0.92); /* 深色半透明遮罩 */
+    display: flex;                       /* 弹性布局，内容居中 */
+    align-items: center;                 /* 垂直居中 */
+    justify-content: center;            /* 水平居中 */
+    z-index: 100;                       /* 盖在画布和按钮上面 */
+    overflow-y: auto;                   /* 内容太长时可以滚动 */
+    padding: 20px;
+}
+
+/* 覆盖层内容容器：限制宽度，居中 */
+.overlay-content {
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+/* 覆盖层标题 */
+.overlay-content h2 {
+    color: #ffffff;
+    font-size: 36px;
+    text-shadow: 2px 2px 4px #000;
+    margin: 0 0 10px;
+    letter-spacing: 4px;
+}
+
+/* 副标题 */
+.subtitle {
+    color: #aaa;
+    font-size: 16px;
+    margin: 0 0 25px;
+}
+
+/* 区块标签（"选择坦克皮肤" / "选择关卡"） */
+.section-label {
+    color: #ccc;
+    font-size: 18px;
+    margin: 20px 0 12px;
+}
+
+/* ---------- 皮肤选择网格 ---------- */
+.skin-grid {
+    display: grid;                       /* 网格布局 */
+    grid-template-columns: repeat(5, 1fr); /* 5 列，每列等宽 */
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* 皮肤卡片：可点击，选中时高亮 */
+.skin-card {
+    background: #3a3a3a;
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 10px 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+/* 鼠标悬停时 */
+.skin-card:hover {
+    background: #444;
+    border-color: #888;
+}
+
+/* 选中状态：金色边框 */
+.skin-card.selected {
+    border-color: #ffc107;
+    background: #3d3520;
+}
+
+/* 皮肤预览画布 */
+.skin-preview {
+    width: 48px;
+    height: 48px;
+}
+
+/* 皮肤名称 */
+.skin-card span {
+    color: #ddd;
+    font-size: 12px;
+}
+
+/* ---------- 关卡选择网格 ---------- */
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 列，2 行 = 10 个关卡 */
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+/* 关卡按钮 */
+.level-btn {
+    background: #3a3a3a;
+    border: 2px solid #555;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 18px;
+    padding: 14px 0;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.level-btn:hover {
+    background: #444;
+    border-color: #888;
+}
+
+/* 选中关卡：蓝色边框 */
+.level-btn.selected {
+    border-color: #1e90ff;
+    background: #1a2a3a;
+}
+
+/* 锁定关卡：灰色、半透明、不可点击 */
+.level-btn.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #2a2a2a;
+}
+
+/* ---------- 大按钮（开始游戏 / 重新挑战） ---------- */
+.big-btn {
+    background: #1e90ff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    padding: 14px 40px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background 0.15s;
+}
+
+.big-btn:hover {
+    background: #1877cd;
+}
+
+.big-btn:active {
+    transform: scale(0.97);
+}
+
+/* 次要按钮（回到主页）：灰色 */
+.btn-secondary {
+    background: #555;
+}
+
+.btn-secondary:hover {
+    background: #666;
+}
+
+/* ---------- 游戏结束统计信息 ---------- */
+.gameover-stats {
+    color: #ccc;
+    font-size: 18px;
+    margin: 15px 0 25px;
+}
+
+.gameover-stats p {
+    margin: 6px 0;
+}
+
+.gameover-stats span {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+/* 游戏结束按钮组 */
+.gameover-btns {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* ---------- 背景选择区 ---------- */
+/* 选择背景按钮所在行 */
+.bg-select-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+/* "选择背景"按钮 */
+.bg-select-btn {
+    background: #6a2a8a;                /* 紫色，呼应 Boss 主题 */
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 8px 22px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.bg-select-btn:hover {
+    background: #7d35a0;
+}
+
+.bg-select-btn:active {
+    transform: scale(0.97);
+}
+
+/* 当前选中的背景名称 */
+.bg-current-name {
+    color: #ffc107;
+    font-size: 14px;
+}
+
+/* 背景缩略图面板（点击按钮后展开） */
+.bg-panel {
+    display: flex;                     /* 三张图横排 */
+    justify-content: center;
+    gap: 14px;
+    margin: 10px 0 18px;
+    flex-wrap: wrap;
+}
+
+/* 单张背景缩略图卡片 */
+.bg-thumb {
+    width: 120px;
+    background: #3a3a3a;
+    border: 3px solid #555;
+    border-radius: 10px;
+    padding: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, transform 0.15s;
+}
+
+.bg-thumb:hover {
+    transform: translateY(-3px);
+}
+
+/* 选中状态：金色高亮边框 */
+.bg-thumb.selected {
+    border-color: #ffc107;
+}
+
+/* 缩略图图片：固定宽高比，cover 填充 */
+.bg-thumb img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+}
+
+/* 缩略图下方名称 */
+.bg-thumb span {
+    display: block;
+    color: #ddd;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* ---------- DeepSeek 关卡评价框 ---------- */
+/* 游戏结束弹窗里的评价区域 */
+.eval-box {
+    background: rgba(40, 20, 60, 0.6);        /* 暗紫底，呼应 AI 主题 */
+    border: 1px solid #6a2a8a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    text-align: left;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* "来自 DeepSeek 的评价：" 标签 */
+.eval-label {
+    color: #b388ff;                          /* 浅紫，突出 AI 来源 */
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+/* 评价正文 */
+.eval-content {
+    color: #fff;
+    font-size: 15px;
+    line-height: 1.6;                        /* 行距宽一点，易读 */
+    min-height: 24px;
+}
+
+/* 小屏幕适配：皮肤和关卡网格变成 3 列 */
+@media (max-width: 600px) {
+    .skin-grid,
+    .level-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .bg-thumb {
+        width: 90px;
+    }
+
+    .bg-thumb img {
+        height: 60px;
+    }
+}

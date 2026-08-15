@@ -1,0 +1,14 @@
+# Netlify 部署配置
+# 这是一个纯静态站点（无构建步骤）+ Netlify Functions
+
+[build]
+  # 静态文件发布目录：仓库根目录（index.html 所在位置）
+  publish = "."
+  # Functions 目录：仓库根下的 functions/，会自动映射到 /.netlify/functions/
+  functions = "functions"
+  # 无需构建，留空
+  command = ""
+
+[functions]
+  # 强制函数运行在 Node 18+，保证全局 fetch 可用
+  node_version = "18"

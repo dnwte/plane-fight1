@@ -1,0 +1,17 @@
+# ===== 密钥 / 敏感文件（绝对不能提交）=====
+DEEPSEEK_API_KEY.txt
+.env
+.env.*
+
+# ===== 本地开发工具产物 =====
+__pycache__/
+*.pyc
+
+# ===== Node =====
+node_modules/
+
+# ===== 系统/编辑器 =====
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
