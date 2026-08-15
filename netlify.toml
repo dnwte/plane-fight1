@@ -9,6 +9,6 @@
   # Functions 目录：仓库根下的 functions/，会自动映射到 /.netlify/functions/
   functions = "functions"
 
-[functions]
-  # 强制函数运行在 Node 18+，保证全局 fetch 可用
-  node_version = "18"
+# Node 版本通过环境变量设置（[functions] 表下没有 node_version 这个键）
+[build.environment]
+  NODE_VERSION = "18"
